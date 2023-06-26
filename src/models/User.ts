@@ -1,8 +1,8 @@
-import { User } from "interfaces/user.interface";
+import { UserProps } from "../interfaces/user.interface";
 import { Schema, model } from "mongoose";
 import bcrypt from "bcrypt";
 
-const userSchema: Schema = new Schema<User>(
+const userSchema: Schema = new Schema<UserProps>(
   {
     name: {
       type: String,
@@ -36,6 +36,10 @@ const userSchema: Schema = new Schema<User>(
       type: Boolean,
       default: false,
     },
+    picture: {
+      type: String,
+      default: "",
+    },
   },
   {
     timestamps: true,
@@ -55,6 +59,6 @@ userSchema.methods.checkPassword = async function (passwordForm: string) {
   return await bcrypt.compare(passwordForm, this.password);
 };
 
-const User = model<User>("User", userSchema);
+const User = model<UserProps>("User", userSchema);
 
 export default User;
