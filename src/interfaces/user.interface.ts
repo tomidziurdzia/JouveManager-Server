@@ -1,3 +1,6 @@
+import { Request } from "express";
+import { JwtPayload } from "jsonwebtoken";
+
 export interface User {
   id?: string;
   name: string;
@@ -8,4 +11,9 @@ export interface User {
   confirmed: boolean;
   googleAccount: boolean;
   token: string;
+}
+
+export interface RequestWithUser extends Request {
+  user?: JwtPayload | { _id: string; token: string };
+  id?: string;
 }
