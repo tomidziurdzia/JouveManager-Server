@@ -11,9 +11,10 @@ export interface UserProps {
   confirmed: boolean;
   googleAccount: boolean;
   token: string;
+  checkPassword(password: string): boolean;
 }
 
 export interface RequestWithUser extends Request {
-  user?: JwtPayload | { _id: string; token: string };
+  user?: JwtPayload | { id: string; token: string };
   id?: string;
 }

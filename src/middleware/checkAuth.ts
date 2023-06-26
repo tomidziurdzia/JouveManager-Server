@@ -24,6 +24,8 @@ const checkAuth = async (
         "-password -token -confirmed -createdAt -updatedAt"
       );
 
+      console.log(checkUser);
+
       if (checkUser) {
         req.user = checkUser;
       }

@@ -2,6 +2,7 @@ import { Response } from "express";
 import generateToken from "../helpers/generateToken";
 import { RequestWithUser } from "../interfaces/user.interface";
 import User from "../models/User";
+import generateJWT from "../helpers/generateJWT";
 
 const createUser = async (req: RequestWithUser, res: Response) => {
   // Prevenir usuarios duplicados
@@ -48,17 +49,116 @@ const createUser = async (req: RequestWithUser, res: Response) => {
   }
 };
 
-const authUser = (req: RequestWithUser, res: Response) => {};
+const confirmToken = async (req: RequestWithUser, res: Response) => {
+  const { token } = req.params;
+  const userExist = await User.findOne({ token });
 
-const confirmToken = (req: RequestWithUser, res: Response) => {};
+  if (!userExist) {
+    const error = new Error("Invalid token");
+    return res.status(403).json({ msg: error.message });
+  }
 
-const forgetPassword = (req: RequestWithUser, res: Response) => {};
+  try {
+    userExist.confirmed = true;
+    userExist.token = "";
+    await userExist.save();
+    res.json({ msg: "Your account has been confirmed, you can sign in" });
+  } catch (error) {
+    console.log(error);
+  }
+};
 
-const checkToken = (req: RequestWithUser, res: Response) => {};
+const authUser = async (req: RequestWithUser, res: Response) => {
+  const { email, password } = req.body;
 
-const newPassword = (req: RequestWithUser, res: Response) => {};
+  // Comprobar si el usuario existe
+  const userExist = await User.findOne({ email });
+  if (!userExist) {
+    const error = new Error("User doesn't exist");
+    return res.status(400).json({ msg: error.message });
+  }
 
-const getUser = (req: RequestWithUser, res: Response) => {};
+  // Comprobar si el usuario esta confirmado
+  if (!userExist.confirmed) {
+    const error = new Error("Your account has not been confirmed");
+    return res.status(404).json({ msg: error.message });
+  }
+
+  // Comprobar password
+  if (await userExist.checkPassword(password)) {
+    res.json({
+      id: userExist.id,
+      name: userExist.name,
+      lastname: userExist.lastname,
+      email: userExist.email,
+      token: generateJWT(userExist.id),
+    });
+  } else {
+    const error = new Error("The password is incorrect");
+    return res.status(403).json({ msg: error.message });
+  }
+};
+
+const forgetPassword = async (req: RequestWithUser, res: Response) => {
+  const { email } = req.body;
+
+  // Comprobar si el usuario existe
+  const userExist = await User.findOne({ email });
+  if (!userExist) {
+    const error = new Error("User doesn't exist");
+    return res.status(404).json({ msg: error.message });
+  }
+
+  try {
+    userExist.token = generateToken();
+    await userExist.save();
+
+    res.json({ msg: "We have sent an email with instructions" });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const checkToken = async (req: RequestWithUser, res: Response) => {
+  const { token } = req.params;
+
+  const userExist = await User.findOne({ token });
+
+  if (!userExist) {
+    const error = new Error("Invalid token");
+    return res.status(403).json({ msg: error.message });
+  } else {
+    res.json({ msg: "Token valid, user exists" });
+  }
+};
+
+const newPassword = async (req: RequestWithUser, res: Response) => {
+  const { token } = req.params;
+  const { password } = req.body;
+
+  const userExist = await User.findOne({ token });
+
+  if (userExist) {
+    userExist.password = password;
+    userExist.token = "";
+
+    try {
+      await userExist.save();
+      res.json({ msg: "Password successfully modified" });
+    } catch (error) {
+      console.log(error);
+    }
+  } else {
+    const error = new Error("Invalid token");
+    return res.status(403).json({ msg: error.message });
+  }
+};
+
+const getUser = (req: RequestWithUser, res: Response) => {
+  const { user } = req;
+  user!.token = generateJWT(user!.id);
+  res.json(user);
+};
 
 export {
   authUser,
