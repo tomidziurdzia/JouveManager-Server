@@ -1,12 +1,12 @@
 import { Response } from "express";
 import generateToken from "../helpers/generateToken";
-import { RequestWithUser } from "../interfaces/user.interface";
+import { RequestWithUser, UserProps } from "../interfaces/user.interface";
 import User from "../models/User";
 import generateJWT from "../helpers/generateJWT";
 
 const createUser = async (req: RequestWithUser, res: Response) => {
   // Prevenir usuarios duplicados
-  const { email, name, lastname, password } = req.body;
+  const { email, name, lastname, password, type }: UserProps = req.body;
   const userExist = await User.findOne({ email });
 
   if (userExist) {
@@ -31,6 +31,11 @@ const createUser = async (req: RequestWithUser, res: Response) => {
 
   if (password === "") {
     const error = new Error("Password cannot be empty");
+    return res.status(400).json({ msg: error.message });
+  }
+
+  if (!type) {
+    const error = new Error("Type cannot be empty");
     return res.status(400).json({ msg: error.message });
   }
 

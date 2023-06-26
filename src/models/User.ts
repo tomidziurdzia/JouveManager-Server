@@ -40,6 +40,11 @@ const userSchema: Schema = new Schema<UserProps>(
       type: String,
       default: "",
     },
+    type: {
+      type: String,
+      required: true,
+      enum: ["administrative", "worker"],
+    },
   },
   {
     timestamps: true,

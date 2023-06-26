@@ -11,6 +11,7 @@ export interface UserProps {
   confirmed: boolean;
   googleAccount: boolean;
   token: string;
+  type: "administrative" | "worker";
   checkPassword(password: string): boolean;
 }
 
