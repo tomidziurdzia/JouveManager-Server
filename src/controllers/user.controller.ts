@@ -5,11 +5,31 @@ import User from "../models/User";
 
 const createUser = async (req: RequestWithUser, res: Response) => {
   // Prevenir usuarios duplicados
-  const { email } = req.body;
+  const { email, name, lastname, password } = req.body;
   const userExist = await User.findOne({ email });
 
   if (userExist) {
     const error = new Error("User already registered");
+    return res.status(400).json({ msg: error.message });
+  }
+
+  if (email === "") {
+    const error = new Error("Email cannot be empty");
+    return res.status(400).json({ msg: error.message });
+  }
+
+  if (name === "") {
+    const error = new Error("Name cannot be empty");
+    return res.status(400).json({ msg: error.message });
+  }
+
+  if (lastname === "") {
+    const error = new Error("Lastname cannot be empty");
+    return res.status(400).json({ msg: error.message });
+  }
+
+  if (password === "") {
+    const error = new Error("Password cannot be empty");
     return res.status(400).json({ msg: error.message });
   }
 
