@@ -6,3 +6,5 @@ export interface VehicleProps {
   user: Object;
   travels: string[];
 }
+
+//TODO: Agregar una imagen

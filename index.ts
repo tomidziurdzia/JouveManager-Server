@@ -4,6 +4,7 @@ import cors from "cors";
 import connectDB from "./src/config/db";
 import userRoutes from "./src/routes/user.routes";
 import vehicleRoutes from "./src/routes/vehicle.routes";
+import travelRoutes from "./src/routes/travel.routes";
 
 const app = express();
 app.use(express.json());
@@ -31,6 +32,7 @@ connectDB();
 //Routing
 app.use("/api/users", userRoutes);
 app.use("/api/vehicles", vehicleRoutes);
+app.use("/api/travels", travelRoutes);
 
 const port = process.env.PORT || 4000;
 app.listen(port, () => {

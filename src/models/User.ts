@@ -43,7 +43,7 @@ const userSchema: Schema = new Schema<UserProps>(
     type: {
       type: String,
       required: true,
-      enum: ["administrative", "worker"],
+      enum: ["administrative", "worker", "assistant"],
     },
   },
   {
