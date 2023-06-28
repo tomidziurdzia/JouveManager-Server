@@ -3,6 +3,7 @@ import { EmployeeProps } from "./employee.interface";
 import { ShipmentProps } from "./shipment.interface";
 import { TravelProps } from "./travel.interface";
 import { VehicleProps } from "./vehicle.interface";
+import { Request } from "express";
 
 export interface BusinessProps {
   id?: string;
@@ -18,7 +19,7 @@ export interface BusinessProps {
   shipment: ShipmentProps[];
 }
 
-export interface RequestWithUser extends Request {
-  user?: JwtPayload | { id: string; token: string };
+export interface RequestBusiness extends Request {
+  business?: JwtPayload | { id: string; token: string };
   id?: string;
 }

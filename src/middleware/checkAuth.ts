@@ -1,10 +1,10 @@
-import { NextFunction, Request, Response } from "express";
-import { RequestWithUser } from "../interfaces/user.interface";
+import { NextFunction, Response } from "express";
 import jwt from "jsonwebtoken";
-import User from "../models/Employee";
+import { RequestBusiness } from "../interfaces/business.interface";
+import Business from "../models/Business";
 
 const checkAuth = async (
-  req: RequestWithUser,
+  req: RequestBusiness,
   res: Response,
   next: NextFunction
 ) => {
@@ -20,12 +20,12 @@ const checkAuth = async (
       const decoded = jwt.verify(token, process.env.JWT_SECRET!);
       const decodedId = Object.values(decoded)[0];
 
-      const checkUser = await User.findById(decodedId).select(
+      const checkBusiness = await Business.findById(decodedId).select(
         "-password -token -confirmed -createdAt -updatedAt"
       );
 
-      if (checkUser) {
-        req.user = checkUser;
+      if (checkBusiness) {
+        req.business = checkBusiness;
       }
       return next();
     } catch (error) {

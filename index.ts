@@ -2,10 +2,11 @@ import express, { Application } from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import connectDB from "./src/config/db";
-import userRoutes from "./src/routes/user.routes";
-import vehicleRoutes from "./src/routes/vehicle.routes";
-import travelRoutes from "./src/routes/travel.routes";
-import shipmentRoutes from "./src/routes/shipment.routes";
+// import userRoutes from "./src/routes/user.routes";
+// import vehicleRoutes from "./src/routes/vehicle.routes";
+// import travelRoutes from "./src/routes/travel.routes";
+// import shipmentRoutes from "./src/routes/shipment.routes";
+import businessRoutes from "./src/routes/business.routes";
 
 const app = express();
 app.use(express.json());
@@ -31,10 +32,11 @@ connectDB();
 // app.use(cors(corsOptions));
 
 //Routing
-app.use("/api/users", userRoutes);
-app.use("/api/vehicles", vehicleRoutes);
-app.use("/api/travels", travelRoutes);
-app.use("/api/shipments", shipmentRoutes);
+// app.use("/api/users", userRoutes);
+// app.use("/api/vehicles", vehicleRoutes);
+// app.use("/api/travels", travelRoutes);
+// app.use("/api/shipments", shipmentRoutes);
+app.use("/api/business", businessRoutes);
 
 const port = process.env.PORT || 4000;
 app.listen(port, () => {

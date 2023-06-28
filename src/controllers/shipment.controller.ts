@@ -1,7 +1,7 @@
 import { RequestWithUser } from "../interfaces/user.interface";
 import { Response } from "express";
 import Shipment from "../models/Shipment";
-import User from "../models/Employee";
+import User from "../models/User";
 import Travel from "../models/Travel";
 
 const getShipments = async (req: RequestWithUser, res: Response) => {};
