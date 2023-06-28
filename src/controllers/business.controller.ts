@@ -5,6 +5,7 @@ import {
 } from "../interfaces/business.interface";
 import Business from "../models/Business";
 import generateToken from "../helpers/generateToken";
+import generateJWT from "../helpers/generateJWT";
 
 const createBusiness = async (req: RequestBusiness, res: Response) => {
   // Prevenir Business duplicados
@@ -65,4 +66,34 @@ const confirmToken = async (req: RequestBusiness, res: Response) => {
     console.log(error);
   }
 };
-export { createBusiness, confirmToken };
+
+const authenticationBusiness = async (req: RequestBusiness, res: Response) => {
+  const { email, password }: BusinessProps = req.body;
+
+  // Comprobar si el usuario existe
+  const businessExist = await Business.findOne({ email });
+  if (!businessExist) {
+    const error = new Error("Business doesn't exist");
+    return res.status(400).json({ msg: error.message });
+  }
+  // Comprobar si el usuario esta confirmado
+  if (!businessExist.confirmed) {
+    const error = new Error("Your business has not been confirmed");
+    return res.status(404).json({ msg: error.message });
+  }
+
+  // Comprobar password
+  if (await businessExist.checkPassword(password)) {
+    res.json({
+      id: businessExist.id,
+      businesNamme: businessExist.businessName,
+      email: businessExist.email,
+      token: generateJWT(businessExist.id),
+    });
+  } else {
+    const error = new Error("The password is incorrect");
+    return res.status(403).json({ msg: error.message });
+  }
+};
+
+export { createBusiness, confirmToken, authenticationBusiness };

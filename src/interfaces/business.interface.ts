@@ -17,6 +17,7 @@ export interface BusinessProps {
   trucks: VehicleProps[];
   travels: TravelProps[];
   shipment: ShipmentProps[];
+  checkPassword: (password: string) => Promise<boolean>;
 }
 
 export interface RequestBusiness extends Request {
