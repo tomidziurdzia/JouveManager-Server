@@ -1,9 +1,14 @@
+import { BusinessProps } from "./business.interface";
+import { EmployeeProps } from "./employee.interface";
+import { ShipmentProps } from "./shipment.interface";
+import { VehicleProps } from "./vehicle.interface";
+
 export interface TravelProps {
   id?: string;
+  business: BusinessProps;
   date: Date;
-  user: Object;
-  driver: Object;
-  assistant: Object;
-  shipment: string[];
-  vehicle: Object;
+  driver: EmployeeProps;
+  assistant: EmployeeProps;
+  shipment: ShipmentProps[];
+  vehicle: VehicleProps;
 }
