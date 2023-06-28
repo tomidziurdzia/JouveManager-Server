@@ -96,4 +96,71 @@ const authenticationBusiness = async (req: RequestBusiness, res: Response) => {
   }
 };
 
-export { createBusiness, confirmToken, authenticationBusiness };
+const forgetPassword = async (req: RequestBusiness, res: Response) => {
+  const { email } = req.body;
+
+  // Comprobar si el business existe
+  const businessExist = await Business.findOne({ email });
+  if (!businessExist) {
+    const error = new Error("Business doesn't exist");
+    return res.status(404).json({ msg: error.message });
+  }
+
+  try {
+    businessExist.token = generateToken();
+    await businessExist.save();
+
+    res.json({ msg: "We have sent an email with instructions" });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const checkToken = async (req: RequestBusiness, res: Response) => {
+  const { token } = req.params;
+  const businessExist = await Business.findOne({ token });
+  if (!businessExist) {
+    const error = new Error("Invalid token");
+    return res.status(403).json({ msg: error.message });
+  } else {
+    res.json({ msg: "Token valid, business exists" });
+  }
+};
+
+const newPassword = async (req: RequestBusiness, res: Response) => {
+  const { token } = req.params;
+  const { password } = req.body;
+
+  const businessExist = await Business.findOne({ token });
+
+  if (businessExist) {
+    businessExist.password = password;
+    businessExist.token = "";
+
+    try {
+      await businessExist.save();
+      res.json({ msg: "Password successfully modified" });
+    } catch (error) {
+      console.log(error);
+    }
+  } else {
+    const error = new Error("Invalid token");
+    return res.status(403).json({ msg: error.message });
+  }
+};
+
+const getUser = (req: RequestBusiness, res: Response) => {
+  const { business } = req;
+  business!.token = generateJWT(business!.id);
+  res.json(business);
+};
+
+export {
+  createBusiness,
+  confirmToken,
+  authenticationBusiness,
+  forgetPassword,
+  checkToken,
+  newPassword,
+  getUser,
+};
