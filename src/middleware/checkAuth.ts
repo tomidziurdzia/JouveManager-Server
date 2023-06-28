@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { RequestWithUser } from "../interfaces/user.interface";
 import jwt from "jsonwebtoken";
-import User from "../models/User";
+import User from "../models/Employee";
 
 const checkAuth = async (
   req: RequestWithUser,

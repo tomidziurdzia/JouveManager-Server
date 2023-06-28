@@ -8,17 +8,17 @@ const travelSchema: Schema = new Schema<TravelProps>(
       required: true,
       default: Date.now(),
     },
-    user: {
+    business: {
       type: Schema.Types.ObjectId,
-      ref: "User",
+      ref: "Business",
     },
     driver: {
       type: Schema.Types.ObjectId,
-      ref: "User",
+      ref: "Employee",
     },
     assistant: {
       type: Schema.Types.ObjectId,
-      ref: "User",
+      ref: "Employee",
     },
     vehicle: {
       type: Schema.Types.ObjectId,

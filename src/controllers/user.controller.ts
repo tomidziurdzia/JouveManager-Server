@@ -1,7 +1,7 @@
 import { Response } from "express";
 import generateToken from "../helpers/generateToken";
 import { RequestWithUser, UserProps } from "../interfaces/user.interface";
-import User from "../models/User";
+import User from "../models/Employee";
 import generateJWT from "../helpers/generateJWT";
 
 const createUser = async (req: RequestWithUser, res: Response) => {

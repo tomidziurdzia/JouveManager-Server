@@ -2,7 +2,7 @@ import Travel from "../models/Travel";
 import { TravelProps } from "../interfaces/travel.interface";
 import { RequestWithUser } from "../interfaces/user.interface";
 import { Response } from "express";
-import User from "../models/User";
+import User from "../models/Employee";
 import Vehicle from "../models/Vehicle";
 
 const getTravels = async (req: RequestWithUser, res: Response) => {

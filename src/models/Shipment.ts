@@ -3,9 +3,9 @@ import { ShipmentProps } from "../interfaces/shipment.interface";
 
 const shipmentSchema: Schema = new Schema<ShipmentProps>(
   {
-    user: {
+    business: {
       type: Schema.Types.ObjectId,
-      ref: "User",
+      ref: "Business",
     },
     travel: {
       type: Schema.Types.ObjectId,

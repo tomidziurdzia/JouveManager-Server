@@ -1,8 +1,8 @@
-import { UserProps } from "../interfaces/user.interface";
 import { Schema, model } from "mongoose";
 import bcrypt from "bcrypt";
+import { EmployeeProps } from "../interfaces/employee.interface";
 
-const userSchema: Schema = new Schema<UserProps>(
+const employeeSchema: Schema = new Schema<EmployeeProps>(
   {
     name: {
       type: String,
@@ -32,10 +32,6 @@ const userSchema: Schema = new Schema<UserProps>(
       type: Boolean,
       default: false,
     },
-    googleAccount: {
-      type: Boolean,
-      default: false,
-    },
     picture: {
       type: String,
       default: "",
@@ -45,6 +41,10 @@ const userSchema: Schema = new Schema<UserProps>(
       required: true,
       enum: ["administrative", "worker", "assistant"],
     },
+    business: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+    },
   },
   {
     timestamps: true,
@@ -52,7 +52,7 @@ const userSchema: Schema = new Schema<UserProps>(
   }
 );
 
-userSchema.pre("save", async function (next) {
+employeeSchema.pre("save", async function (next) {
   if (!this.isModified("password")) {
     next();
   }
@@ -60,10 +60,10 @@ userSchema.pre("save", async function (next) {
   this.password = await bcrypt.hash(this.password, salt);
 });
 
-userSchema.methods.checkPassword = async function (passwordForm: string) {
+employeeSchema.methods.checkPassword = async function (passwordForm: string) {
   return await bcrypt.compare(passwordForm, this.password);
 };
 
-const User = model<UserProps>("User", userSchema);
+const Employee = model<EmployeeProps>("Employee", employeeSchema);
 
-export default User;
+export default Employee;

@@ -8,6 +8,7 @@ export interface EmployeeProps {
   picture: string;
   password: string;
   token: string;
+  confirmed: boolean;
   type: "Administrative" | "Driver" | "Assistant" | "";
   business: BusinessProps;
 }

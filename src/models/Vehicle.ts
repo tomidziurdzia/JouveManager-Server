@@ -19,9 +19,9 @@ const vehicleSchema: Schema = new Schema<VehicleProps>(
       required: true,
       enum: ["Chasis Truck", "Balancin Truck", "Semirremolque"],
     },
-    user: {
+    business: {
       type: Schema.Types.ObjectId,
-      ref: "User",
+      ref: "Business",
     },
     travels: [
       {
