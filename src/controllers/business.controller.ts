@@ -46,4 +46,23 @@ const createBusiness = async (req: RequestBusiness, res: Response) => {
     console.log(error);
   }
 };
-export { createBusiness };
+
+const confirmToken = async (req: RequestBusiness, res: Response) => {
+  const { token } = req.params;
+  const businessExist = await Business.findOne({ token });
+
+  if (!businessExist) {
+    const error = new Error("Invalid token");
+    return res.status(403).json({ msg: error.message });
+  }
+
+  try {
+    businessExist.confirmed = true;
+    businessExist.token = "";
+    await businessExist.save();
+    res.json({ msg: "Your business has been confirmed, you can sign in" });
+  } catch (error) {
+    console.log(error);
+  }
+};
+export { createBusiness, confirmToken };
