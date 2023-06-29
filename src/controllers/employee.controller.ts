@@ -1,30 +1,7 @@
 import { Response } from "express";
 import { RequestBusiness } from "../interfaces/business.interface";
 import Employee from "../models/Employee";
-import { EmployeeProps } from "../interfaces/employee.interface";
-import { JwtPayload } from "jsonwebtoken";
-import { Document, Types } from "mongoose";
-
-//   id?: string;
-//   name: string;
-//   lastname: string;
-//   email: string;
-//   picture: string;
-//   password: string;
-//   type: "Administrative" | "Driver" | "Assistant" | "";
-//   business: BusinessProps;
-
-const checkBusiness = (
-  employee:
-    | (Document<unknown, {}, EmployeeProps> &
-        Omit<EmployeeProps & { _id: Types.ObjectId }, never>)
-    | null,
-  business: JwtPayload | { id: string; token: string } | undefined
-) => {
-  if (employee!.business?.toString() !== business?.id.toString()) {
-    throw new Error("Employee does not belong to business");
-  }
-};
+import { checkBusiness } from "../helpers/checkBusiness";
 
 const getEmployees = async (req: RequestBusiness, res: Response) => {
   const employees = await Employee.find()

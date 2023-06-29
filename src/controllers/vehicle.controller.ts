@@ -1,20 +1,21 @@
 import { Response } from "express";
 import { VehicleProps } from "../interfaces/vehicle.interface";
 import Vehicle from "../models/Vehicle";
-import { RequestWithUser } from "../interfaces/user.interface";
+import { RequestBusiness } from "../interfaces/business.interface";
+import { checkBusiness } from "../helpers/checkBusiness";
 
-const getVehicles = async (req: RequestWithUser, res: Response) => {
+const getVehicles = async (req: RequestBusiness, res: Response) => {
   // const vehicles = await Vehicle.find()
   //   .populate({ path: "travels", select: "km" })
-  //   .where("user")
-  //   .equals(req.user);
+  //   .where("business")
+  //   .equals(req.business);
   // res.json(vehicles);
-  const vehicles = await Vehicle.find().where("user").equals(req.user);
+  const vehicles = await Vehicle.find().where("business").equals(req.business);
 
   res.json(vehicles);
 };
 
-const newVehicle = async (req: RequestWithUser, res: Response) => {
+const newVehicle = async (req: RequestBusiness, res: Response) => {
   const { patent, typeVehicle, model }: VehicleProps = req.body;
 
   //Comprobar vehiculos duplicados
@@ -43,7 +44,7 @@ const newVehicle = async (req: RequestWithUser, res: Response) => {
 
   // Guardar vehiculo
   const vehicle = new Vehicle(req.body);
-  vehicle.user = req.user!.id;
+  vehicle.business = req.business!.id;
   try {
     const vehicleStored = await vehicle.save();
     res.json(vehicleStored);
@@ -52,17 +53,10 @@ const newVehicle = async (req: RequestWithUser, res: Response) => {
   }
 };
 
-const getVehicle = async (req: RequestWithUser, res: Response) => {
+const getVehicle = async (req: RequestBusiness, res: Response) => {
   const { id } = req.params;
 
-  // Verifico la longitud del id
-  if (id.length !== 24) {
-    const error = new Error("Not found");
-    return res.status(404).json({ msg: error.message });
-  }
-
   const vehicle = await Vehicle.findById(id);
-
   // Comprubo que exista el vehiculo
   if (!vehicle) {
     const error = new Error("Not found");
@@ -70,22 +64,13 @@ const getVehicle = async (req: RequestWithUser, res: Response) => {
   }
 
   // Verifico que el vehiculo pertenezca al usuario logueado
-  if (vehicle.user.toString() !== req.user!.id.toString()) {
-    const error = new Error("Invalid action");
-    return res.status(404).json({ msg: error.message });
-  }
+  checkBusiness(vehicle, req.business);
 
   res.json(vehicle);
 };
 
-const editVehicle = async (req: RequestWithUser, res: Response) => {
+const editVehicle = async (req: RequestBusiness, res: Response) => {
   const { id } = req.params;
-
-  // Verifico la longitud del id
-  if (id.length !== 24) {
-    const error = new Error("Not found");
-    return res.status(404).json({ msg: error.message });
-  }
 
   const vehicle = await Vehicle.findById(id);
 
@@ -96,10 +81,7 @@ const editVehicle = async (req: RequestWithUser, res: Response) => {
   }
 
   // Verifico que el vehiculo pertenezca al usuario logueado
-  if (vehicle.user.toString() !== req.user!.id.toString()) {
-    const error = new Error("Invalid action");
-    return res.status(404).json({ msg: error.message });
-  }
+  checkBusiness(vehicle, req.business);
 
   vehicle.model = req.body.model || vehicle.model;
   vehicle.typeVehicle = req.body.typeVehicle || vehicle.typeVehicle;
@@ -112,14 +94,8 @@ const editVehicle = async (req: RequestWithUser, res: Response) => {
   }
 };
 
-const deleteVehicle = async (req: RequestWithUser, res: Response) => {
+const deleteVehicle = async (req: RequestBusiness, res: Response) => {
   const { id } = req.params;
-
-  // Verifico la longitud del id
-  if (id.length !== 24) {
-    const error = new Error("Not found");
-    return res.status(404).json({ msg: error.message });
-  }
 
   const vehicle = await Vehicle.findById(id);
 
@@ -130,10 +106,7 @@ const deleteVehicle = async (req: RequestWithUser, res: Response) => {
   }
 
   // Verifico que el vehiculo pertenezca al usuario logueado
-  if (vehicle.user.toString() !== req.user!.id.toString()) {
-    const error = new Error("Invalid action");
-    return res.status(404).json({ msg: error.message });
-  }
+  checkBusiness(vehicle, req.business);
 
   try {
     await vehicle.deleteOne();
