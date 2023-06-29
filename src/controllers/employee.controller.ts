@@ -2,6 +2,8 @@ import { Response } from "express";
 import { RequestBusiness } from "../interfaces/business.interface";
 import Employee from "../models/Employee";
 import { EmployeeProps } from "../interfaces/employee.interface";
+import { JwtPayload } from "jsonwebtoken";
+import { Document, Types } from "mongoose";
 
 //   id?: string;
 //   name: string;
@@ -11,6 +13,18 @@ import { EmployeeProps } from "../interfaces/employee.interface";
 //   password: string;
 //   type: "Administrative" | "Driver" | "Assistant" | "";
 //   business: BusinessProps;
+
+const checkBusiness = (
+  employee:
+    | (Document<unknown, {}, EmployeeProps> &
+        Omit<EmployeeProps & { _id: Types.ObjectId }, never>)
+    | null,
+  business: JwtPayload | { id: string; token: string } | undefined
+) => {
+  if (employee!.business?.toString() !== business?.id.toString()) {
+    throw new Error("Employee does not belong to business");
+  }
+};
 
 const getEmployees = async (req: RequestBusiness, res: Response) => {
   const employees = await Employee.find()
@@ -55,11 +69,55 @@ const createEmployee = async (req: RequestBusiness, res: Response) => {
   }
 };
 
-const getEmployee = async (req: RequestBusiness, res: Response) => {};
+const getEmployee = async (req: RequestBusiness, res: Response) => {
+  const { id } = req.params;
+  try {
+    //Verifico que el employee sea del business logueado
+    const employee = await Employee.findById(id);
+    checkBusiness(employee, req.business);
 
-const editEmployee = async (req: RequestBusiness, res: Response) => {};
+    res.json(employee);
+  } catch (error: any) {
+    return res.status(400).json({ msg: error.message });
+  }
+};
 
-const deleteEmployee = async (req: RequestBusiness, res: Response) => {};
+const editEmployee = async (req: RequestBusiness, res: Response) => {
+  const { id } = req.params;
+  try {
+    //Verifico que el employee sea del business logueado
+    const employee = await Employee.findById(id);
+    checkBusiness(employee, req.business);
+
+    employee!.name = req.body.name || employee!.name;
+    employee!.lastname = req.body.lastname || employee!.lastname;
+    employee!.email = req.body.email || employee!.email;
+    employee!.password = req.body.password || employee!.name;
+    employee!.type = req.body.type || employee!.type;
+
+    await employee?.save();
+    res.json(employee);
+  } catch (error: any) {
+    return res.status(400).json({ msg: error.message });
+  }
+};
+
+const deleteEmployee = async (req: RequestBusiness, res: Response) => {
+  const { id } = req.params;
+
+  try {
+    //Verifico que el employee sea del business logueado
+    const employee = await Employee.findById(id);
+    checkBusiness(employee, req.business);
+
+    //TODO: Agregar que no se puede eliminar el empleado si tiene algun ship hecho
+
+    await employee?.deleteOne();
+    res.json({ msg: "Employee successfully eliminated" });
+  } catch (error: any) {
+    return res.status(400).json({ msg: error.message });
+  }
+};
 
 export {
   getEmployees,

@@ -32,7 +32,7 @@ const employeeSchema: Schema = new Schema<EmployeeProps>(
     type: {
       type: String,
       required: true,
-      enum: ["administrative", "worker", "assistant"],
+      enum: ["administrative", "driver", "assistant"],
     },
     business: {
       type: Schema.Types.ObjectId,
