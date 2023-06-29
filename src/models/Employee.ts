@@ -25,13 +25,6 @@ const employeeSchema: Schema = new Schema<EmployeeProps>(
       required: true,
       trim: true,
     },
-    token: {
-      type: String,
-    },
-    confirmed: {
-      type: Boolean,
-      default: false,
-    },
     picture: {
       type: String,
       default: "",

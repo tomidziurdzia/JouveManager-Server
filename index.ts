@@ -7,6 +7,7 @@ import connectDB from "./src/config/db";
 // import travelRoutes from "./src/routes/travel.routes";
 // import shipmentRoutes from "./src/routes/shipment.routes";
 import businessRoutes from "./src/routes/business.routes";
+import employeeRoutes from "./src/routes/employee.routes";
 
 const app = express();
 app.use(express.json());
@@ -37,6 +38,7 @@ connectDB();
 // app.use("/api/travels", travelRoutes);
 // app.use("/api/shipments", shipmentRoutes);
 app.use("/api/business", businessRoutes);
+app.use("/api/employees", employeeRoutes);
 
 const port = process.env.PORT || 4000;
 app.listen(port, () => {

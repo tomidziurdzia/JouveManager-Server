@@ -13,10 +13,10 @@ export interface BusinessProps {
   password: string;
   confirmed: boolean;
   token: string;
-  employees: EmployeeProps[];
-  trucks: VehicleProps[];
-  travels: TravelProps[];
-  shipment: ShipmentProps[];
+  // employees: EmployeeProps[];
+  // trucks: VehicleProps[];
+  // travels: TravelProps[];
+  // shipment: ShipmentProps[];
   checkPassword: (password: string) => Promise<boolean>;
 }
 

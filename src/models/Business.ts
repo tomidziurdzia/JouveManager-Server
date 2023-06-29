@@ -31,30 +31,30 @@ const businessSchema: Schema = new Schema<BusinessProps>(
       type: String,
       default: "",
     },
-    employees: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: "Employee",
-      },
-    ],
-    trucks: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: "Vehicle",
-      },
-    ],
-    travels: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: "Travel",
-      },
-    ],
-    shipment: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: "Shipment",
-      },
-    ],
+    // employees: [
+    //   {
+    //     type: Schema.Types.ObjectId,
+    //     ref: "Employee",
+    //   },
+    // ],
+    // trucks: [
+    //   {
+    //     type: Schema.Types.ObjectId,
+    //     ref: "Vehicle",
+    //   },
+    // ],
+    // travels: [
+    //   {
+    //     type: Schema.Types.ObjectId,
+    //     ref: "Travel",
+    //   },
+    // ],
+    // shipment: [
+    //   {
+    //     type: Schema.Types.ObjectId,
+    //     ref: "Shipment",
+    //   },
+    // ],
   },
   {
     timestamps: true,
