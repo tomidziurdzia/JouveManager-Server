@@ -1,17 +1,28 @@
-import { RequestWithUser } from "../interfaces/user.interface";
 import { Response } from "express";
 import Shipment from "../models/Shipment";
-import User from "../models/User";
 import Travel from "../models/Travel";
+import { RequestBusiness } from "../interfaces/business.interface";
+import { checkBusiness } from "../helpers/checkBusiness";
 
-const getShipments = async (req: RequestWithUser, res: Response) => {};
+const getShipments = async (req: RequestBusiness, res: Response) => {
+  const shipments = await Shipment.find()
+    .populate({
+      path: "travel",
+      populate: {
+        path: "driver",
+        select: "-shipments -business",
+      },
+    })
+    .where("business")
+    .equals(req.business);
 
-const newShipment = async (req: RequestWithUser, res: Response) => {
+  res.json(shipments);
+};
+
+const newShipment = async (req: RequestBusiness, res: Response) => {
   const { from, to, client, description, travel } = req.body;
 
   const travelExist = await Travel.findById(travel);
-
-  console.log(travelExist);
 
   // Campos obligatorios
   if (!from) {
@@ -33,9 +44,9 @@ const newShipment = async (req: RequestWithUser, res: Response) => {
 
   try {
     const newShipment = new Shipment(req.body);
-    newShipment.user = req.user?.id;
+    newShipment.business = req.business?._id;
 
-    travelExist!.shipment.push(newShipment.id);
+    travelExist!.shipments.push(newShipment._id as any);
     await travelExist?.save();
 
     await newShipment.save();
@@ -45,7 +56,7 @@ const newShipment = async (req: RequestWithUser, res: Response) => {
   }
 };
 
-const getShipment = async (req: RequestWithUser, res: Response) => {
+const getShipment = async (req: RequestBusiness, res: Response) => {
   const { id } = req.params;
 
   // Verifico la longitud del id
@@ -54,10 +65,12 @@ const getShipment = async (req: RequestWithUser, res: Response) => {
     return res.status(404).json({ msg: error.message });
   }
 
-  const shipment = await Shipment.findById(id);
+  const shipment = await Shipment.findById(id).populate("travel");
 
   // Verifico que el shipment pertenezca al usuario logueado
-  if (shipment?.user.toString() !== req.user!.id.toString()) {
+  checkBusiness(shipment, req.business);
+
+  if (shipment?.business.toString() !== req.business!._id.toString()) {
     const error = new Error("Invalid action");
     return res.status(404).json({ msg: error.message });
   }
@@ -70,7 +83,7 @@ const getShipment = async (req: RequestWithUser, res: Response) => {
   res.json(shipment);
 };
 
-const editShipment = async (req: RequestWithUser, res: Response) => {
+const editShipment = async (req: RequestBusiness, res: Response) => {
   const { id } = req.params;
 
   // Verifico la longitud del id
@@ -82,10 +95,7 @@ const editShipment = async (req: RequestWithUser, res: Response) => {
   const shipment = await Shipment.findById(id);
 
   // Verifico que el shipment pertenezca al usuario logueado
-  if (shipment?.user.toString() !== req.user!.id.toString()) {
-    const error = new Error("Invalid action");
-    return res.status(404).json({ msg: error.message });
-  }
+  checkBusiness(shipment, req.business);
 
   if (!shipment) {
     const error = new Error("Not found");
@@ -108,7 +118,7 @@ const editShipment = async (req: RequestWithUser, res: Response) => {
   }
 };
 
-const deleteShipment = async (req: RequestWithUser, res: Response) => {
+const deleteShipment = async (req: RequestBusiness, res: Response) => {
   const { id } = req.params;
 
   // Verifico la longitud del id
@@ -117,21 +127,25 @@ const deleteShipment = async (req: RequestWithUser, res: Response) => {
     return res.status(404).json({ msg: error.message });
   }
 
-  const shipment = await Shipment.findById(id);
+  const shipment = await Shipment.findById(id).populate("travel");
+  const travel = await Travel.findById(shipment?.travel._id);
 
-  // Verifico que el shipment pertenezca al usuario logueado
-  if (shipment?.user.toString() !== req.user!.id.toString()) {
-    const error = new Error("Invalid action");
-    return res.status(404).json({ msg: error.message });
-  }
-
+  // Compruebo que exista la travel
   if (!shipment) {
     const error = new Error("Not found");
     return res.status(404).json({ msg: error.message });
   }
 
+  // Verifico que el shipment pertenezca al usuario logueado
+  checkBusiness(shipment, req.business);
+  checkBusiness(travel, req.business);
+
+  //TODO: No puedo corregir esto
   try {
-    await shipment.deleteOne();
+    await Promise.all([
+      await travel!.updateOne({ $pull: { shipments: id } }),
+      await shipment.deleteOne(),
+    ]);
     res.json({ msg: "Shipment successfully eliminated" });
   } catch (error) {
     console.log(error);

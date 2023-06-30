@@ -24,7 +24,7 @@ const travelSchema: Schema = new Schema<TravelProps>(
       type: Schema.Types.ObjectId,
       ref: "Vehicle",
     },
-    shipment: [
+    shipments: [
       {
         type: Schema.Types.ObjectId,
         ref: "Shipment",

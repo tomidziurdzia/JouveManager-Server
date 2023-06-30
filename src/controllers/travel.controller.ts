@@ -43,7 +43,8 @@ const newTravel = async (req: RequestBusiness, res: Response) => {
 
   // Verifico que el vehiculo, assistente y driver pertenezca al usuario logueado
   checkBusiness(driverExist, req.business);
-
+  checkBusiness(assistantExist, req.business);
+  checkBusiness(vehicleExist, req.business);
   // Verifico los campos obligatorios
   if (!date) {
     const error = new Error("Date is required");
@@ -88,10 +89,7 @@ const getTravel = async (req: RequestBusiness, res: Response) => {
   }
 
   // Verifico que el travel pertenezca al usuario logueado
-  if (travel.business.toString() !== req.business!._id.toString()) {
-    const error = new Error("Invalid action");
-    return res.status(404).json({ msg: error.message });
-  }
+  checkBusiness(travel, req.business);
 
   res.json(travel);
 };
@@ -107,10 +105,7 @@ const editTravel = async (req: RequestBusiness, res: Response) => {
   }
 
   // Verifico que el travel pertenezca al usuario logueado
-  if (travel?.business.toString() !== req.business!._id.toString()) {
-    const error = new Error("Invalid action");
-    return res.status(404).json({ msg: error.message });
-  }
+  checkBusiness(travel, req.business);
 
   travel!.date = date || travel?.date;
   travel!.driver = driver || travel?.driver;
@@ -135,7 +130,7 @@ const deleteTravels = async (req: RequestBusiness, res: Response) => {
   }
 
   const travel = await Travel.findById(id).populate("vehicle");
-  const vehicle = await Vehicle.findById(travel?.vehicle);
+  const vehicle = await Vehicle.findById(travel?.vehicle._id);
 
   // Compruebo que exista la travel
   if (!travel) {
@@ -144,19 +139,13 @@ const deleteTravels = async (req: RequestBusiness, res: Response) => {
   }
 
   // Verifico que la plataforma pertenezca al usuario logueado
-  if (travel.business.toString() !== req.business!._id.toString()) {
-    const error = new Error("Invalid action");
-    return res.status(404).json({ msg: error.message });
-  }
+  checkBusiness(travel, req.business);
+  checkBusiness(vehicle, req.business);
 
-  //TODO: No se puede eliminar un viaje que tiene shipment o ver como corregir eso para que al eliminar tambien se elimine los shipments
-
+  //TODO: No puedo corregir esto
   try {
-    await Promise.allSettled([
-      await vehicle!.updateOne(
-        { _id: vehicle?._id },
-        { $pull: { travels: id } }
-      ),
+    await Promise.all([
+      await vehicle!.updateOne({ $pull: { travels: id } }),
       await travel.deleteOne(),
     ]);
     res.json({ msg: "Travel successfully eliminated" });

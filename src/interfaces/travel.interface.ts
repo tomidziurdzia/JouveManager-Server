@@ -10,6 +10,6 @@ export interface TravelProps extends Document {
   date: Date;
   driver: EmployeeProps;
   assistant: EmployeeProps;
-  shipment: ShipmentProps[];
+  shipments: ShipmentProps[];
   vehicle: VehicleProps;
 }
