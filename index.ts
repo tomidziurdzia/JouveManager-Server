@@ -4,7 +4,7 @@ import cors from "cors";
 import connectDB from "./src/config/db";
 // import userRoutes from "./src/routes/user.routes";
 import vehicleRoutes from "./src/routes/vehicle.routes";
-// import travelRoutes from "./src/routes/travel.routes";
+import travelRoutes from "./src/routes/travel.routes";
 // import shipmentRoutes from "./src/routes/shipment.routes";
 import businessRoutes from "./src/routes/business.routes";
 import employeeRoutes from "./src/routes/employee.routes";
@@ -35,7 +35,7 @@ connectDB();
 //Routing
 // app.use("/api/users", userRoutes);
 app.use("/api/vehicles", vehicleRoutes);
-// app.use("/api/travels", travelRoutes);
+app.use("/api/travels", travelRoutes);
 // app.use("/api/shipments", shipmentRoutes);
 app.use("/api/business", businessRoutes);
 app.use("/api/employees", employeeRoutes);

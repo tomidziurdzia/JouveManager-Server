@@ -6,7 +6,7 @@ import { VehicleProps } from "./vehicle.interface";
 import { Request } from "express";
 
 export interface BusinessProps {
-  id?: string;
+  _id?: string;
   businessName: string;
   email: string;
   logo?: string;
@@ -21,6 +21,6 @@ export interface BusinessProps {
 }
 
 export interface RequestBusiness extends Request {
-  business?: JwtPayload | { id: string; token: string };
+  business?: JwtPayload | { _id: string; token: string };
   id?: string;
 }

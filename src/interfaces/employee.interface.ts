@@ -1,7 +1,7 @@
 import { BusinessProps } from "./business.interface";
 
 export interface EmployeeProps {
-  id?: string;
+  _id?: string;
   name: string;
   lastname: string;
   email: string;

@@ -44,7 +44,7 @@ const newVehicle = async (req: RequestBusiness, res: Response) => {
 
   // Guardar vehiculo
   const vehicle = new Vehicle(req.body);
-  vehicle.business = req.business!.id;
+  vehicle.business = req.business!._id;
   try {
     const vehicleStored = await vehicle.save();
     res.json(vehicleStored);

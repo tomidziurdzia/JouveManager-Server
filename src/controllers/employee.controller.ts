@@ -14,6 +14,13 @@ const getEmployees = async (req: RequestBusiness, res: Response) => {
 const createEmployee = async (req: RequestBusiness, res: Response) => {
   const { name, lastname, email, password, type } = req.body;
 
+  const employeeExist = await Employee.findOne({ email });
+
+  if (employeeExist) {
+    const error = new Error("Employee already registered");
+    return res.status(400).json({ msg: error.message });
+  }
+
   if (!name) {
     const error = new Error("Name is required");
     return res.status(404).json({ msg: error.message });
@@ -37,7 +44,7 @@ const createEmployee = async (req: RequestBusiness, res: Response) => {
 
   try {
     const newEmployee = new Employee(req.body);
-    newEmployee.business = req.business?.id;
+    newEmployee.business = req.business!._id;
 
     await newEmployee.save();
     res.json(newEmployee);

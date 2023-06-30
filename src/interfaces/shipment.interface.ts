@@ -2,7 +2,7 @@ import { BusinessProps } from "./business.interface";
 import { TravelProps } from "./travel.interface";
 
 export interface ShipmentProps {
-  id?: string;
+  _id?: string;
   business: BusinessProps;
   travel: TravelProps;
   from: string;

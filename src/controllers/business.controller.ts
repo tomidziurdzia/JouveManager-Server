@@ -85,10 +85,10 @@ const authenticationBusiness = async (req: RequestBusiness, res: Response) => {
   // Comprobar password
   if (await businessExist.checkPassword(password)) {
     res.json({
-      id: businessExist.id,
+      _id: businessExist._id,
       businesNamme: businessExist.businessName,
       email: businessExist.email,
-      token: generateJWT(businessExist.id),
+      token: generateJWT(businessExist._id),
     });
   } else {
     const error = new Error("The password is incorrect");
@@ -151,7 +151,7 @@ const newPassword = async (req: RequestBusiness, res: Response) => {
 
 const getUser = (req: RequestBusiness, res: Response) => {
   const { business } = req;
-  business!.token = generateJWT(business!.id);
+  business!.token = generateJWT(business!._id);
   res.json(business);
 };
 
