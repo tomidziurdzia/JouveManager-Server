@@ -17,7 +17,11 @@ const vehicleSchema: Schema = new Schema<VehicleProps>(
     typeVehicle: {
       type: String,
       required: true,
-      enum: ["Chasis Truck", "Balancin Truck", "Semirremolque"],
+      enum: ["chasis truck", "balancin truck", "semirremolque", "tractor"],
+    },
+    picture: {
+      type: String,
+      default: "",
     },
     business: {
       type: Schema.Types.ObjectId,

@@ -81,6 +81,7 @@ const editEmployee = async (req: RequestBusiness, res: Response) => {
 
     await employee?.save();
     res.json(employee);
+    console.log(employee);
   } catch (error: any) {
     return res.status(400).json({ msg: error.message });
   }

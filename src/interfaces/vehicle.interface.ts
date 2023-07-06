@@ -6,7 +6,7 @@ export interface VehicleProps extends Document {
   _id?: string;
   patent: string;
   model: string;
-  typeVehicle: "Chasis Truck" | "Balancin Truck" | "Semirremolque" | "Tractor";
+  typeVehicle: "chasis truck" | "balancin truck" | "semirremolque" | "tractor";
   business: BusinessProps;
   travels: TravelProps[];
   picture?: string;

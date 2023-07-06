@@ -6,6 +6,7 @@ import {
 import Business from "../models/Business";
 import generateToken from "../helpers/generateToken";
 import generateJWT from "../helpers/generateJWT";
+import { emailForgetPassword, emailRegister } from "../helpers/mailService";
 
 const createBusiness = async (req: RequestBusiness, res: Response) => {
   // Prevenir Business duplicados
@@ -36,8 +37,16 @@ const createBusiness = async (req: RequestBusiness, res: Response) => {
   try {
     const newBusiness = new Business(req.body);
 
+    // Enviar el email de confirmacion
+
     //Generar Token
     newBusiness.token = generateToken();
+
+    emailRegister({
+      businessName: newBusiness.businessName,
+      email: newBusiness.email,
+      token: newBusiness.token,
+    });
 
     //Almacenar nuevo usuario
     await newBusiness.save();
@@ -72,6 +81,17 @@ const authenticationBusiness = async (req: RequestBusiness, res: Response) => {
 
   // Comprobar si el usuario existe
   const businessExist = await Business.findOne({ email });
+
+  if (email === "") {
+    const error = new Error("Email cannot be empty");
+    return res.status(400).json({ msg: error.message });
+  }
+
+  if (password === "") {
+    const error = new Error("Password cannot be empty");
+    return res.status(400).json({ msg: error.message });
+  }
+
   if (!businessExist) {
     const error = new Error("Business doesn't exist");
     return res.status(400).json({ msg: error.message });
@@ -86,7 +106,7 @@ const authenticationBusiness = async (req: RequestBusiness, res: Response) => {
   if (await businessExist.checkPassword(password)) {
     res.json({
       _id: businessExist._id,
-      businesNamme: businessExist.businessName,
+      businessName: businessExist.businessName,
       email: businessExist.email,
       token: generateJWT(businessExist._id),
     });
@@ -108,6 +128,13 @@ const forgetPassword = async (req: RequestBusiness, res: Response) => {
 
   try {
     businessExist.token = generateToken();
+
+    // Enviar email con instrucciones
+    emailForgetPassword({
+      email: businessExist.email,
+      businessName: businessExist.businessName,
+      token: businessExist.token,
+    });
     await businessExist.save();
 
     res.json({ msg: "We have sent an email with instructions" });
@@ -132,6 +159,11 @@ const newPassword = async (req: RequestBusiness, res: Response) => {
   const { password } = req.body;
 
   const businessExist = await Business.findOne({ token });
+
+  if (!businessExist) {
+    const error = new Error("Invalid token");
+    return res.status(403).json({ msg: error.message });
+  }
 
   if (businessExist) {
     businessExist.password = password;
