@@ -38,14 +38,16 @@ const newTravel = async (req: RequestBusiness, res: Response) => {
     return res.status(404).json({ msg: error.message });
   }
 
-  if (!assistantExist) {
-    const error = new Error("Assistant does't exist");
-    return res.status(404).json({ msg: error.message });
+  if (req.body.assistant !== undefined) {
+    if (!assistantExist) {
+      const error = new Error("Assistant does't exist");
+      return res.status(404).json({ msg: error.message });
+    }
+    checkBusiness(assistantExist, req.business);
   }
 
   // Verifico que el vehiculo, assistente y driver pertenezca al usuario logueado
   checkBusiness(driverExist, req.business);
-  checkBusiness(assistantExist, req.business);
   checkBusiness(vehicleExist, req.business);
   // Verifico los campos obligatorios
   if (!date) {
@@ -61,7 +63,11 @@ const newTravel = async (req: RequestBusiness, res: Response) => {
       newTravel.semirremolque = null;
     }
 
+    driverExist.travels?.push(newTravel._id as any);
+    assistantExist?.travels?.push(newTravel._id as any);
     vehicleExist?.travels.push(newTravel._id as any);
+    await driverExist.save();
+    await assistantExist?.save();
     await vehicleExist?.save();
 
     await newTravel.save();
@@ -143,6 +149,8 @@ const deleteTravels = async (req: RequestBusiness, res: Response) => {
 
   const travel = await Travel.findById(id).populate("vehicle");
   const vehicle = await Vehicle.findById(travel?.vehicle._id);
+  const driver = await Employee.findById(travel?.driver._id);
+  const assistant = await Employee.findById(travel?.assistant._id);
 
   // Compruebo que exista la travel
   if (!travel) {
@@ -158,6 +166,8 @@ const deleteTravels = async (req: RequestBusiness, res: Response) => {
   try {
     await Promise.all([
       await vehicle!.updateOne({ $pull: { travels: id } }),
+      await driver!.updateOne({ $pull: { travels: id } }),
+      await assistant!.updateOne({ $pull: { travels: id } }),
       await travel.deleteOne(),
     ]);
     res.json({ msg: "Travel successfully eliminated" });

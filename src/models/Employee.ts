@@ -38,6 +38,12 @@ const employeeSchema: Schema = new Schema<EmployeeProps>(
       type: Schema.Types.ObjectId,
       ref: "User",
     },
+    travels: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Travel",
+      },
+    ],
   },
   {
     timestamps: true,

@@ -109,6 +109,11 @@ const deleteVehicle = async (req: RequestBusiness, res: Response) => {
   checkBusiness(vehicle, req.business);
 
   try {
+    if (vehicle?.travels?.length !== 0) {
+      return res
+        .status(400)
+        .json({ msg: "You can't remove vehicles with travels" });
+    }
     await vehicle.deleteOne();
     res.json({ msg: "Vehicle successfully eliminated" });
   } catch (error) {

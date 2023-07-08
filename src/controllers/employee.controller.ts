@@ -97,7 +97,14 @@ const deleteEmployee = async (req: RequestBusiness, res: Response) => {
 
     //TODO: Agregar que no se puede eliminar el empleado si tiene algun ship hecho
 
+    if (employee?.travels?.length !== 0) {
+      return res
+        .status(400)
+        .json({ msg: "You can't remove employees with travels" });
+    }
+
     await employee?.deleteOne();
+
     res.json({ msg: "Employee successfully eliminated" });
   } catch (error: any) {
     return res.status(400).json({ msg: error.message });
