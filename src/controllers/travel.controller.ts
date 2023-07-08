@@ -17,6 +17,8 @@ const getTravels = async (req: RequestBusiness, res: Response) => {
     })
     .populate({ path: "assistant", select: "name lastname type picture" })
     .populate({ path: "vehicle", select: "patent model typeVehicle" })
+    .populate({ path: "semirremolque", select: "patent model typeVehicle" })
+
     .where("business")
     .equals(req.business);
 
@@ -55,6 +57,10 @@ const newTravel = async (req: RequestBusiness, res: Response) => {
     const newTravel = new Travel(req.body);
     newTravel.business = req.business!._id;
 
+    if (newTravel.vehicle.typeVehicle !== "tractor") {
+      newTravel.semirremolque = null;
+    }
+
     vehicleExist?.travels.push(newTravel._id as any);
     await vehicleExist?.save();
 
@@ -80,7 +86,9 @@ const getTravel = async (req: RequestBusiness, res: Response) => {
       select: "name lastname type picture",
     })
     .populate({ path: "assistant", select: "name lastname type picture" })
-    .populate({ path: "vehicle", select: "patent model typeVehicle" });
+    .populate({ path: "vehicle", select: "patent model typeVehicle" })
+    .populate({ path: "semirremolque", select: "patent model typeVehicle" });
+
   //TODO: Falta relacionar la tabla con los shipment
 
   if (!travel) {
@@ -111,6 +119,10 @@ const editTravel = async (req: RequestBusiness, res: Response) => {
   travel!.driver = driver || travel?.driver;
   travel!.assistant = assistant || travel?.assistant;
   travel!.vehicle = vehicle || travel?.vehicle;
+  travel!.semirremolque =
+    travel?.vehicle.typeVehicle !== "tractor"
+      ? null
+      : travel!.semirremolque || travel?.semirremolque;
 
   try {
     const travelStored = await travel?.save();

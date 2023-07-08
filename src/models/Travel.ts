@@ -24,6 +24,10 @@ const travelSchema: Schema = new Schema<TravelProps>(
       type: Schema.Types.ObjectId,
       ref: "Vehicle",
     },
+    semirremolque: {
+      type: Schema.Types.ObjectId,
+      ref: "Vehicle",
+    },
     shipments: [
       {
         type: Schema.Types.ObjectId,

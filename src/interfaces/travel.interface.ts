@@ -12,4 +12,5 @@ export interface TravelProps extends Document {
   assistant: EmployeeProps;
   shipments: ShipmentProps[];
   vehicle: VehicleProps;
+  semirremolque: VehicleProps | null;
 }
