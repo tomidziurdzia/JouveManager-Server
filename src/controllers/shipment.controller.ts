@@ -8,10 +8,24 @@ const getShipments = async (req: RequestBusiness, res: Response) => {
   const shipments = await Shipment.find()
     .populate({
       path: "travel",
-      populate: {
+      select:'date',
+      populate: [{
         path: "driver",
-        select: "-shipments -business",
+        select: "name lastname email picture",
       },
+      {
+        path: "assistant",
+          select: "name lastname email picture",
+      },
+      {
+        path:'vehicle',
+        select:'model patent picture typeVehicle'
+      },
+      {
+        path:'semirremolque',
+        select:'model patent picture typeVehicle'
+      }
+    ]
     })
     .where("business")
     .equals(req.business);

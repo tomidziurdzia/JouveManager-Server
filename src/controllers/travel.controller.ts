@@ -95,8 +95,6 @@ const getTravel = async (req: RequestBusiness, res: Response) => {
     .populate({ path: "vehicle", select: "patent model typeVehicle" })
     .populate({ path: "semirremolque", select: "patent model typeVehicle" });
 
-  //TODO: Falta relacionar la tabla con los shipment
-
   if (!travel) {
     const error = new Error("Not found");
     return res.status(404).json({ msg: error.message });
