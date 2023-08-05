@@ -26,11 +26,13 @@ const getTravels = async (req: RequestBusiness, res: Response) => {
 };
 
 const newTravel = async (req: RequestBusiness, res: Response) => {
-  const { date, driver, assistant, vehicle }: TravelProps = req.body;
+  const { date, driver, assistant, vehicle, semirremolque }: TravelProps = req.body;
 
   const driverExist = await Employee.findById(driver);
   const assistantExist = await Employee.findById(assistant);
   const vehicleExist = await Vehicle.findById(vehicle);
+  const semirremolqueExist = await Vehicle.findById(semirremolque)
+  console.log(semirremolqueExist)
 
   // Verifico que exista el chofer donde se ingresa el travel
   if (!driverExist) {
@@ -59,19 +61,21 @@ const newTravel = async (req: RequestBusiness, res: Response) => {
     const newTravel = new Travel(req.body);
     newTravel.business = req.business!._id;
 
-    if (newTravel.vehicle.typeVehicle !== "tractor") {
-      newTravel.semirremolque = null;
-    }
+    // if (newTravel.vehicle.typeVehicle !== "tractor") {
+    //   newTravel.semirremolque = null;
+    // }
 
     driverExist.travels?.push(newTravel._id as any);
     assistantExist?.travels?.push(newTravel._id as any);
     vehicleExist?.travels.push(newTravel._id as any);
+    semirremolqueExist?.travels.push(newTravel._id as any)
     await driverExist.save();
     await assistantExist?.save();
     await vehicleExist?.save();
-
+    await semirremolqueExist?.save()
     await newTravel.save();
 
+    console.log(newTravel)
     res.json(newTravel);
   } catch (error) {
     console.log(error);
@@ -148,7 +152,15 @@ const deleteTravels = async (req: RequestBusiness, res: Response) => {
   const travel = await Travel.findById(id).populate("vehicle");
   const vehicle = await Vehicle.findById(travel?.vehicle._id);
   const driver = await Employee.findById(travel?.driver._id);
-  const assistant = await Employee.findById(travel?.assistant._id);
+let assistant
+  if(travel?.assistant !== null){
+    assistant = await Employee.findById(travel?.assistant._id);
+  }
+
+  let semirremolque
+  if(travel?.semirremolque?._id !== null) {
+    semirremolque = await Vehicle.findById(travel?.semirremolque?._id)
+  }
 
   // Compruebo que exista la travel
   if (!travel) {
@@ -160,14 +172,27 @@ const deleteTravels = async (req: RequestBusiness, res: Response) => {
   checkBusiness(travel, req.business);
   checkBusiness(vehicle, req.business);
 
-  //TODO: No puedo corregir esto
   try {
-    await Promise.all([
-      await vehicle!.updateOne({ $pull: { travels: id } }),
-      await driver!.updateOne({ $pull: { travels: id } }),
-      await assistant!.updateOne({ $pull: { travels: id } }),
-      await travel.deleteOne(),
-    ]);
+    if (travel.shipments.length !== 0) {
+      return res
+        .status(400)
+        .json({ msg: "You can't remove travels with shipments" });
+    }
+
+  const promises = [
+    vehicle!.updateOne({ $pull: { travels: id } }),
+    driver!.updateOne({ $pull: { travels: id } }),
+    travel.deleteOne()
+  ];
+
+  if (assistant !== undefined) {
+    promises.push(assistant!.updateOne({ $pull: { travels: id } }));
+  }
+  if(semirremolque !== undefined) {
+    promises.push(semirremolque!.updateOne({ $pull: { travels: id } }));
+
+  }
+  await Promise.all(promises);
     res.json({ msg: "Travel successfully eliminated" });
   } catch (error) {
     console.log(error);

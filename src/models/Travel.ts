@@ -19,6 +19,7 @@ const travelSchema: Schema = new Schema<TravelProps>(
     assistant: {
       type: Schema.Types.ObjectId,
       ref: "Employee",
+      default: null
     },
     vehicle: {
       type: Schema.Types.ObjectId,
@@ -27,6 +28,7 @@ const travelSchema: Schema = new Schema<TravelProps>(
     semirremolque: {
       type: Schema.Types.ObjectId,
       ref: "Vehicle",
+      default:null
     },
     shipments: [
       {

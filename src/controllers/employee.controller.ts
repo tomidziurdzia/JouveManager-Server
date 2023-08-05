@@ -57,7 +57,7 @@ const getEmployee = async (req: RequestBusiness, res: Response) => {
   const { id } = req.params;
   try {
     //Verifico que el employee sea del business logueado
-    const employee = await Employee.findById(id);
+    const employee = await Employee.findById(id).select('name lastname picture type business').populate({path:'travels'})
     checkBusiness(employee, req.business);
 
     res.json(employee);
